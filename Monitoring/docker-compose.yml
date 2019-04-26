@@ -21,7 +21,6 @@ services:
 
   grafana:
     image: grafana/grafana
-    restart: always
     container_name: grafana
     user: "104"
     depends_on:
@@ -33,6 +32,7 @@ services:
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     env_file:
       - ./grafana/config.monitoring
+    restart: always
 
   node-exporter:
     image: prom/node-exporter
