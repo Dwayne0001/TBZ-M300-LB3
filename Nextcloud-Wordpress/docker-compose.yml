@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3'
 
 services:
   db-nc:
@@ -56,7 +56,6 @@ services:
         limits:
           cpus: '0.5'
           memory: 1024M
-    user: "nginx:nginx"
     
 
   db-wp:
