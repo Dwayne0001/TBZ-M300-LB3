@@ -13,5 +13,5 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
-script:
+install:
   - docker-compose -f ./Monitoring/docker-compose.yml -d up
