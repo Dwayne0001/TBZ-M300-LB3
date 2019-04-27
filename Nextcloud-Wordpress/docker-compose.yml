@@ -1,6 +1,9 @@
 version: '3'
 
 services:
+  # ==================================================================================
+  # Nextcloud (DB + App + Webserver)
+  # ==================================================================================
   db-nc:
     image: mariadb
     container_name: nextcloud-mariadb
@@ -20,7 +23,7 @@ services:
           memory: 256M
 
   app-nc:
-    image: nextcloud:fpm-alpine
+    build: ./app-nc
     container_name: nextcloud-app
     restart: always
     volumes:
@@ -56,8 +59,11 @@ services:
         limits:
           cpus: '0.5'
           memory: 1024M
-    
 
+
+  # ==================================================================================
+  # Wordpress (DB + App)
+  # ==================================================================================
   db-wp:
     image: mariadb
     container_name: wordpress-mariadb
@@ -99,6 +105,10 @@ services:
           cpus: '0.5'
           memory: 1024M
 
+
+  # ==================================================================================
+  # phpMyAdmin
+  # ==================================================================================
   app-pma:
     image: phpmyadmin/phpmyadmin:latest
     container_name: phpmyadmin
@@ -118,6 +128,10 @@ services:
           cpus: '0.5'
           memory: 1024M
 
+
+  # ==================================================================================
+  # Certificate + Proxy
+  # ==================================================================================
   certs:
     image: paulczar/omgwtfssl
     container_name: certificate
