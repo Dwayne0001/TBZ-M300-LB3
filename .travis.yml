@@ -24,7 +24,7 @@ before_script:
   - echo "127.0.0.1  nc.network.local" | sudo tee -a /etc/hosts
   - echo "127.0.0.1  wp.network.local" | sudo tee -a /etc/hosts
   - echo "127.0.0.1  pma.network.local" | sudo tee -a /etc/hosts
-  - docker-compose -f ./Nextcloud-Wordpress/docker-compose.yml up -d
+  - docker-compose -f ./Nextcloud-Wordpress/docker-compose.yml up -d --build
   - sleep 30
 
 script: ./scripts/test.sh
