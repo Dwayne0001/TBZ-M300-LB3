@@ -29,6 +29,10 @@ Anderes Repository (LB2): <https://github.com/NiArq/TBZ-M300>
     - [Häufige Befehle](#häufige-befehle)
     - [Testfälle](#testfälle)
   - [K4 - Sicherheit](#k4---sicherheit)
+    - [Service-Überwachung](#service-Überwachung)
+    - [Aktive Benachrichtigung](#aktive-benachrichtigung)
+    - [Container Absicherung](#container-absicherung)
+      - [Beispiele](#beispiele)
   - [K5 - Allgemein](#k5---allgemein)
   - [K6 - Zusatz](#k6---zusatz)
 
@@ -172,8 +176,6 @@ Das Schichtenmodell zeigt lediglich den Aufbau von _Docker für Windows_. Zu unt
 <kbd><img src="./img/M300_LB3_Workflow.jpg" width=100% /></kbd> \
 *Abbildung 3: Workflow*
 
-<!-- TODO: Change Workflow-Diagramm (No Dockerfile) -->
-
 Es wird eine `docker-compose.yml`-Datei verwendet, um mehrere Container zu erstellen. In der Abbildung 3 sieht man den Workflow zur Container-Aufbau. \
 Die YAML-Datei erstellt die Container, resp. baut sie nach hinterlegten Dockerfile auf, welche wiederum ggf. auf Datein zugreifen können.
 
@@ -262,6 +264,87 @@ Voraussetzungen: Container sind gestartet.
 <br>
 
 ## K4 - Sicherheit
+
+### Service-Überwachung
+Für die Container-Überwachung auf _Docker for Windows_ gibt es ein OpenSource-Tool, welches von der Community containisiert wurde: <https://github.com/maheshmahadevan/docker-monitoring-windows>. \
+Es beinhaltet Prometheus (Backend) und Grafana (Frontend). Standardmässig gibt es zwei Dashboard: _Docker Host_ und _Docker Containers_. Darin werden bereits mehrere Ressourcen geloggt und grafisch dargestellt. \
+
+Zudem lassen sich damit auch Alarme einstellen, so dass bei einer vordefinierten Ereignis eine E-Mail, Slack-Benachrichtigung, etc. gesendet wird. \
+Aber damit auch E-Mails versendet werden können, muss der SMTP-Server vorher in der `config.monitoring` definiert werden. \
+
+Sobald die Container gestartet sind, kann über <http://localhost:3000/> die Oberfläche aufgerufen werden. User und Passwort ist standardmässig `admin`. \
+Anschliessend kann man beispielsweise einen Dashboard öffnen und dort die Auswertungen sehen. Zwar kann man diese über die Benutzeroberfläche bearbeiten, kann sie aber nicht abspeichern. Man muss entweder die Config (wird beim Speichern angezeigt) in die Zwischenablage kopieren, oder speichert es direkt als JSON-Datei ab. Diese Datei wird anschliessend in *./Monitoring/grafana/privisioning/dashboards* gespeichert. \
+In meinem Beispiel habe ich ein neues Dashboard _Custom Dashboard.json_, welches auf _Docker Containers.json_ basiert. Ich habe lediglich noch einen Memory Usage-Panel hinzugefügt und daraus ein Alarm erstellt, sollte die Nutzung die 200MB überschreiten. \
+**HINWEIS**: Damit die E-Mail versendet wird, muss im `config.monitoring` die SMTP-Daten angegeben werden. Ansonsten funktioniert es nicht.
+
+Alle Dateien und Container befinden sich im Ordner [Monitoring](./Monitoring).
+
+<br>
+
+### Aktive Benachrichtigung
+Wie bereits unter [Service-Überwachung](#Service-Überwachung) beschrieben, habe ich testweise einen Alarm erstellt, welches mir eine E-Mail sendet, sofern die Arbeitsspeicher-Auslastung die 200MB Grenze überschreitet (SMTP-Server muss vorher eingerichtet sein). \
+
+Mit Grafana lässt aber noch viel mehr Benachrichtungen einstellen, wie z.B. Slack-Benachrichtigung, etc. Auch lassen sich diverse Alarme/Benachrichtungen einstellen.
+
+<br>
+
+### Container Absicherung
+Um die Container selber abzusichern habe ich folgende Punkte erledigt:
+
+- Non-Root User definiert*
+- CPU-Nutzung begrenzt
+- Arbeitsspeicher-Nutzung begrenzt
+
+
+Der User kann entweder direkt im `docker-compose.yml` oder im Dockerfile definiert werden.
+- docker-compose.yml --> `user: "Benutzer:Gruppe"` (siehe Beispiel)
+- Dockerfile --> `USER Benutzer` (siehe Beispiel) 
+
+
+CPU und Arbeitspeicher kann nur im `docker-compose.yml` begrenzt werden (oder direkt per Befehlszeile):
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+<br>
+
+#### Beispiele
+- docker-compose.yml
+  ```
+  db-nc:
+    image: mariadb
+    container_name: nextcloud-mariadb
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    restart: always
+    volumes:
+      - db-nc:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=nextcloud
+    env_file:
+      - db-nc.env
+    user: "mysql:mysql"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+  ```
+
+- Dockerfile (USER)
+  ```
+  FROM nextcloud:fpm-alpine
+
+  RUN addgroup -g 2906 -S appuser && \
+      adduser -u 2906 -S appuser -G appuser
+  USER appuser
+  ```
+
+<br>
+
+\* Es können nicht alle Container als Non-Root User ausgeführt werden, da gewisse Zugriff auf Systempfade benötigten. Möchte man diese dennoch als normalen User ausführen, müsste man diese Container komplett von Grund auf selber aufbauen.
 
 
 <br>
