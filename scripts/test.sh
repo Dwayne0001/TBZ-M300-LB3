@@ -7,6 +7,7 @@ do
     status_code=$(curl --write-out %{http_code} --silent --head --output /dev/null -k $s)
 
     if [[ "$status_code" -ne 200 ]] ; then
+        echo Site $s exits with code $status_code
         exit 1
     else
         exit 0
