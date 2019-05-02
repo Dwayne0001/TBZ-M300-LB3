@@ -34,7 +34,13 @@ Anderes Repository (LB2): <https://github.com/NiArq/TBZ-M300>
     - [Container Absicherung](#container-absicherung)
       - [Beispiele](#beispiele)
   - [K5 - Allgemein](#k5---allgemein)
+    - [Vergleich Vorwissen - Wissenszuwachs](#vergleich-vorwissen---wissenszuwachs)
+    - [Reflexion](#reflexion)
   - [K6 - Zusatz](#k6---zusatz)
+    - [Umfangreiche Vernetzung](#umfangreiche-vernetzung)
+    - [Image-Bereitstellung](#image-bereitstellung)
+    - [Continuous Integration](#continuous-integration)
+    - [Kubernetes (theoretisch)](#kubernetes-theoretisch)
 
 <br>
 <br>
@@ -62,7 +68,7 @@ Das aus dem simplen Grund, dass alles nur noch komplizierter wird, wenn ich zus�
 Und weil ich _Docker for Windows_ verwende, musste ich den Hypervisor von VirtualBox zu Hyper-V von Windows wechseln (andere Hypervisor werden nicht unterstützt). Dazu muss lediglich das Windows-Feature aktiviert werden (mit der Docker-Installtion wird das automatisch aktiviert).
 
 
-Voraussetzung für Docker und Hyper-V ist, dass man Windows 10 Pro, Education oder Enterprise hat. Da Hyper-V nur auf diesen Versionen verfügbar ist.
+Voraussetzung für Docker und Hyper-V ist, dass man Windows 10 Pro/Education/Enterprise hat. Da Hyper-V nur auf diesen Versionen verfügbar ist.
 
 <br>
 <br>
@@ -90,6 +96,8 @@ Zudem gewährleisten Container die Trennung/Verwaltung der genutzten Ressourcen.
 Ich kannte zwar _Docker_ schon vorher, hatte es aber noch nie verwendet. Ich wusste dass es mit Container arbeitet und dass wir es im Betrieb einzesetzen, mehr aber nicht.
 
 Docker ist eine OpenSource-Software, welches die Bereitstellung von Anwendungen vereinfacht. Es arbeitet mit Container, welche die Anwendung inkl. Abhänigkeiten beinhalten. Somit ist es ziemlich leicht das Ganze zu transportieren und zu installieren.
+
+Um ein Container auf Docker zu erstellen, muss man ein _Dockerfile_ erstellen (ähnlich wie bei Vagrant). Aber im Gegensatz zu Vagrant enthält es nur einfache Befehle (FROM, COPY, USER, RUN) und kommuniziert mit keinem Hypervisor. Sobald man sein Dockerfile hat, muss das zuerst zu einem Image "gebaut" werden. Anschliessend kann damit ein Container erstellt und gestartet werden. Optional kann man sein Image auch benennen und auf Docker Hub veröffentlichen.
 
 Die Applikationsentwickler bei uns verwenden es unter anderem um ihre Applikationen zu testen.
 
@@ -294,6 +302,7 @@ Um die Container selber abzusichern habe ich folgende Punkte erledigt:
 - Non-Root User definiert*
 - CPU-Nutzung begrenzt
 - Arbeitsspeicher-Nutzung begrenzt
+- Restart-Eingeschaft definiert (Was passiert wenn die Contianer sich selber ausschalten)
 
 
 Der User kann entweder direkt im `docker-compose.yml` oder im Dockerfile definiert werden.
@@ -308,6 +317,14 @@ CPU und Arbeitspeicher kann nur im `docker-compose.yml` begrenzt werden (oder di
         limits:
           cpus: '0.25'
           memory: 256M
+
+
+Die Restart-Eingeschaft wird im `docker-compose.yml` definiert. Es beschreibt, was passieren soll, sofern ein Container sich selber ausschaltet (sei es durch einen Befehl oder einen Absturz):
+    
+    restart: <option>
+
+Als `<option>` gibt es: `no`, `always`, `on-failure` oder `unless-stopped` \
+Standardmässig verwendet man `always`, sofern der Container nicht von selbst ausgeschaltet werden soll.
 
 <br>
 
@@ -333,7 +350,7 @@ CPU und Arbeitspeicher kann nur im `docker-compose.yml` begrenzt werden (oder di
           memory: 256M
   ```
 
-- Dockerfile (USER)
+- Dockerfile (_`USER appuser`_)
   ```
   FROM nextcloud:fpm-alpine
 
@@ -352,9 +369,64 @@ CPU und Arbeitspeicher kann nur im `docker-compose.yml` begrenzt werden (oder di
 
 ## K5 - Allgemein
 
+### Vergleich Vorwissen - Wissenszuwachs
+Anfangs der LB3 hatte ich praktisch keine Ahnung von Docker, Container, Docker-Compose, etc. Zwar wusste ich was Docker ungefähr ist, aber hatte damit noch nichts zu tun gehabt. \
+Aber ich dafür hatte schon mehrfach mit Hyper-V zu tun, unter anderem an der SwissSkills 2018 (Virtualisierung der benötigten VMs). Wie alle andere Hypervisor (VMware Workstation Player, Oracle VirtualBox) funktioniert es ungefähr gleich. Die Benutzeroberfläche ist meist selbsterklärend.
+
+Im Laufe der LB3 habe ich sehr vieles dazu gelernt unter anderem was Docker und Container sind und wie sie funktionieren (In [K2 - Infrastruktur](#K2---Infrastruktur) ausführlich erklärt). Auch habe ich mich mit Docker-Compose und der YAML-Sprache (_**Y**AML **A**in't **M**arkup **L**anguage_ / früher: _**Y**et **A**nother **M**arkup **L**anguage_) vertraut gemacht. \
+Mit YAML kannte ich bereits vorher, da ich früher hobbymässig Game-Server betreut habe und viele Konfigurationsdateien auf YAML geschrieben wurden.
+
+Docker-Compose wird benötigt um mehrere Container gleichzeitg zu erstellen, welche untereinander kommunizieren können. Die Konfiugrationsdatei heisst `docker-compose.yml` und wird in YAML geschrieben. Darin werden _[Services](#microservices)_, _[Volumes](#Volumes)_ und Netzwerke definiert. Ein Service wird beispielsweise mit Image, Container Name, Restart-Option, [Volumes](#Volumes), Umgebungsvariablen und Netzwerk beschrieben. \
+Aber es können auch andere Einstellungen genutzt werden, beispielsweise `build: <path>` statt `image: <image>` verwendet werden (`<path>` => Ordnerpfad zu einem Dockerfile). Dabei wird dann aus einem Dockerfile der Container erstellt, statt nur aus einer Image. Es ist zwar nützlich, wenn man noch einige Einstellungen treffen möchte (wie z.B. User erstellen und verwenden), aber man sollte es bei Docker-Compose wenn möglich vermeiden. Und falls ein Dockerfile benötigt wird, sollte es so simpel wie möglich sein. \
+Am Schluss erhält man von einem Docker-Compose ganze _[Microservices](#microservices)_, statt einzelne Container.
+
+Wird wie bei mir ein `docker-compose.yml` verwendet, muss man andere Befehle nutzen, als die von Docker (siehe [Häufige Befehle](#Häufige-Befehle)):
+- `docker-compose -f <path_to_docker-compose.yml> up --build`
+- Oder sofern kein `build`-Option genutzt wird:
+  `docker-compose -f <path_to_docker-compose.yml> up`
+- Oder wenn man sich direkt im Ordner des `docker-compose.yml` befindet:
+  `docker-compose up`
+
+Nach meinen Tests, musste ich jeweils alle Container und Volumes entferen, um die nächsten Tests nicht zu verfälschen. Dafür gibt es zwei Befehle:
+| Aktion                 | Befehl                                                      |
+|------------------------|-------------------------------------------------------------|
+| Alle Container löschen | `docker rm -f $(docker ps -a -q)`                           |
+| Alle Volumes löschen   | `docker volume prune -f`                                    |
+| Einzeiler (Bash)       | `docker rm -f $(docker ps -a -q) && docker volume prune -f` |
+| Einzeiler (PowerShell) | `docker rm -f $(docker ps -a -q); docker volume prune -f`   |
+
+<br>
+
+### Reflexion
+Die ganze LB3 war ziemlich mühsam, das liegt aber unter anderem daran, dass praktisch alles neu war. Bei der LB2 ging es hauptsächlich um Virtuelle Maschinen und deren Automatisierung. Da wir praktisch seit Beginn mit VMs arbeiten, musste ich nur die Automatisierung lernen, was nicht allzu schwer war (Vagrant besteht praktisch nur aus einer Vagrantfile-Datei). \
+Hingegen bei LB3 musste ich alles von Beginn an lernen, da nicht mehr VMs sondern Container das Hauptthema war. Und zuvor hatte ich noch nie mit Container gearbeitet. Zudem ist Docker und Containerisierung kein einfaches Thema. Zwar gibt es bei Docker auch ein _Dockerfile_-Datei (wie bei Vagrant), aber es besitzt ein anderes Syntax und wird anders gestartet (man baut aus dem Dockerfile zuerst ein Image). \
+Zudem kam noch _Docker-Compose_ hinzu, was ich anfangs schon gar nicht verstanden habe. Aber Docker-Compose ist einfach gesagt eine "Erweiterung" von Docker. Damit lassen sich mehrere Container auf einmal erstellen und starten, welche untereinander kommunizieren können. So können ganze _[Microservices](#microservices)_ gebaut werden.
+
+Ebenfalls machen es die Bewertungskriterien und der Sprachaufenthalt von der BMS die ganze LB nicht einfacher. Meiner Meinung nach wird für die volle Punktzahl 
+zu viel erwartet, da wir unter anderem 4 Lektionen weniger Zeit haben (Sechseläuten). Auch nehmen gewisse Bewertungspunkte übermässig viel Zeit in Anspruch, so dass man nur schwer vorankommt. \
+Beispielsweise in K6 wird "Cloud-Integration" oder "Continuous Integration" vorgeschlagen. Ich habe mich für "Continuous Integration" entschieden. Alleine für das benötigte ich mind. einen halben Tag, bis alles funktioniert hat. Um es einfacher zu gestalten, musste ich ein neues Repositroy auf GitHub erstellen. Aber es war nicht die Integration, welche so viel Zeit in Anspruch genommen hat, sondern das Script für das Testing und die Tests (mehr Infos unter [Continuous Integration](#Continuous-Integration)).
+
+Insgesamt habe ich für die LB3 ungefähr einen Zeitaufwand von mindestens **26 Stunden** (Geschäft: 2 Halbtage à ~4h + 1 Tag ~8h, Schule: ~6h (8 Lektionen), zuhause: mind. 4h).
 
 
 <br>
 <br>
 
 ## K6 - Zusatz
+
+### Umfangreiche Vernetzung
+
+
+<br>
+
+### Image-Bereitstellung
+
+
+<br>
+
+### Continuous Integration
+
+
+<br>
+
+### Kubernetes (theoretisch)
