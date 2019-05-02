@@ -388,6 +388,7 @@ Wird wie bei mir ein `docker-compose.yml` verwendet, muss man andere Befehle nut
   `docker-compose up`
 
 Nach meinen Tests, musste ich jeweils alle Container und Volumes entferen, um die nächsten Tests nicht zu verfälschen. Dafür gibt es zwei Befehle:
+
 | Aktion                 | Befehl                                                      |
 |------------------------|-------------------------------------------------------------|
 | Alle Container löschen | `docker rm -f $(docker ps -a -q)`                           |
