@@ -344,13 +344,14 @@ CPU und Arbeitspeicher kann nur im `docker-compose.yml` begrenzt werden (oder di
 
 <br>
 
-\* Es können nicht alle Container als Non-Root User ausgeführt werden, da gewisse Zugriff auf Systempfade benötigten. Möchte man diese dennoch als normalen User ausführen, müsste man diese Container komplett von Grund auf selber aufbauen.
+\* Es können nicht alle Container als Non-Root User ausgeführt werden, da diese Zugriff auf Systempfade benötigen (ansonsten erscheint die Fehlermeldung "Permission denied"). Möchte man sie dennoch als normalen User ausführen, müsste man solche Container komplett von Grund auf selber aufbauen. Was aus Zeitgründen in diesem Modul nicht möglich ist.
 
 
 <br>
 <br>
 
 ## K5 - Allgemein
+
 
 
 <br>
