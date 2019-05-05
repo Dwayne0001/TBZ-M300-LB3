@@ -35,12 +35,14 @@ Anderes Repository (LB2): <https://github.com/NiArq/TBZ-M300>
       - [Beispiele](#beispiele)
   - [K5 - Allgemein](#k5---allgemein)
     - [Vergleich Vorwissen - Wissenszuwachs](#vergleich-vorwissen---wissenszuwachs)
+      - [Docker-Compose](#docker-compose)
+      - [Continuous Integration](#continuous-integration)
     - [Reflexion](#reflexion)
   - [K6 - Zusatz](#k6---zusatz)
     - [Umfangreiche Vernetzung](#umfangreiche-vernetzung)
     - [Image-Bereitstellung](#image-bereitstellung)
-    - [Continuous Integration](#continuous-integration)
-    - [Kubernetes (theoretisch)](#kubernetes-theoretisch)
+      - [.dockerignore](#dockerignore)
+    - [Continuous Integration](#continuous-integration-1)
 
 <br>
 <br>
@@ -48,13 +50,14 @@ Anderes Repository (LB2): <https://github.com/NiArq/TBZ-M300>
 ## K1 - Toolumgebung
 VS Code, Git-Client, Markdown-Editor und SSH-Keys gleichbleibend wie in [LB2](..\LB2).
 
-| Kategorie          | Produkt                                              |
-| ------------------ | ---------------------------------------------------- |
-| Versionsverwaltung | [Git](https://git-scm.com/)                          |
-| Hypervisor         | Hyper-V by Windows (Windows Feature)                 |
-| Container Engine   | [Docker for Windows](https://www.docker.com/)        |
-| Editor / IDE       | [Visual Studio Code](https://code.visualstudio.com/) |
-| Markdown-Editor    | [Typora](https://typora.io/)                         |
+| Kategorie              | Produkt                                              |
+| ------------------     | ---------------------------------------------------- |
+| Versionsverwaltung     | [Git](https://git-scm.com/)                          |
+| Hypervisor             | Hyper-V by Windows (Windows Feature)                 |
+| Container Engine       | [Docker for Windows](https://www.docker.com/)        |
+| Editor / IDE           | [Visual Studio Code](https://code.visualstudio.com/) |
+| Markdown-Editor        | [Typora](https://typora.io/)                         |
+| Continuous Integration | [Travis CI](https://travis-ci.org)                   |
 
 <br>
 
@@ -292,7 +295,7 @@ Alle Dateien und Container befinden sich im Ordner [Monitoring](./Monitoring).
 ### Aktive Benachrichtigung
 Wie bereits unter [Service-Überwachung](#Service-Überwachung) beschrieben, habe ich testweise einen Alarm erstellt, welches mir eine E-Mail sendet, sofern die Arbeitsspeicher-Auslastung die 200MB Grenze überschreitet (SMTP-Server muss vorher eingerichtet sein). \
 
-Mit Grafana lässt aber noch viel mehr Benachrichtungen einstellen, wie z.B. Slack-Benachrichtigung, etc. Auch lassen sich diverse Alarme/Benachrichtungen einstellen.
+Mit Grafana lässt aber noch viel mehr Benachrichtungen einstellen, wie z. B. Slack-Benachrichtigung, etc. Auch lassen sich diverse Alarme/Benachrichtungen einstellen.
 
 <br>
 
@@ -376,8 +379,9 @@ Aber ich dafür hatte schon mehrfach mit Hyper-V zu tun, unter anderem an der Sw
 Im Laufe der LB3 habe ich sehr vieles dazu gelernt unter anderem was Docker und Container sind und wie sie funktionieren (In [K2 - Infrastruktur](#K2---Infrastruktur) ausführlich erklärt). Auch habe ich mich mit Docker-Compose und der YAML-Sprache (_**Y**AML **A**in't **M**arkup **L**anguage_ / früher: _**Y**et **A**nother **M**arkup **L**anguage_) vertraut gemacht. \
 Mit YAML kannte ich bereits vorher, da ich früher hobbymässig Game-Server betreut habe und viele Konfigurationsdateien auf YAML geschrieben wurden.
 
+#### Docker-Compose
 Docker-Compose wird benötigt um mehrere Container gleichzeitg zu erstellen, welche untereinander kommunizieren können. Die Konfiugrationsdatei heisst `docker-compose.yml` und wird in YAML geschrieben. Darin werden _[Services](#microservices)_, _[Volumes](#Volumes)_ und Netzwerke definiert. Ein Service wird beispielsweise mit Image, Container Name, Restart-Option, [Volumes](#Volumes), Umgebungsvariablen und Netzwerk beschrieben. \
-Aber es können auch andere Einstellungen genutzt werden, beispielsweise `build: <path>` statt `image: <image>` verwendet werden (`<path>` => Ordnerpfad zu einem Dockerfile). Dabei wird dann aus einem Dockerfile der Container erstellt, statt nur aus einer Image. Es ist zwar nützlich, wenn man noch einige Einstellungen treffen möchte (wie z.B. User erstellen und verwenden), aber man sollte es bei Docker-Compose wenn möglich vermeiden. Und falls ein Dockerfile benötigt wird, sollte es so simpel wie möglich sein. \
+Aber es können auch andere Einstellungen genutzt werden, beispielsweise `build: <path>` statt `image: <image>` verwendet werden (`<path>` => Ordnerpfad zu einem Dockerfile). Dabei wird dann aus einem Dockerfile der Container erstellt, statt nur aus einer Image. Es ist zwar nützlich, wenn man noch einige Einstellungen treffen möchte (wie z. B. User erstellen und verwenden), aber man sollte es bei Docker-Compose wenn möglich vermeiden. Und falls ein Dockerfile benötigt wird, sollte es so simpel wie möglich sein. \
 Am Schluss erhält man von einem Docker-Compose ganze _[Microservices](#microservices)_, statt einzelne Container.
 
 Wird wie bei mir ein `docker-compose.yml` verwendet, muss man andere Befehle nutzen, als die von Docker (siehe [Häufige Befehle](#Häufige-Befehle)):
@@ -396,6 +400,15 @@ Nach meinen Tests, musste ich jeweils alle Container und Volumes entferen, um di
 | Einzeiler (Bash)       | `docker rm -f $(docker ps -a -q) && docker volume prune -f` |
 | Einzeiler (PowerShell) | `docker rm -f $(docker ps -a -q); docker volume prune -f`   |
 
+
+#### Continuous Integration
+Von _Continuous Integration_ (kurz CI) hatte ich zuvor noch nie etwas gehört. Zwar sagte mir _Jenkins_ (belibter CI) etwas, aber an sich wusste ich nicht, wie das fukntioniert und was das genau ist.
+
+Jetzt weiss ich, dass CI (vor allem) für die Entwicklung von Software benutzt wird. Dabei wird an der Software "gebastelt" und danach z. B. auf GitHub hochgeladen. Anschliessend testet ein CI-Programm (z. B. _Jenkins_ oder _Travis CI_) mithilfe eines vordefinierten Scripts die hochgeladene Software. Wird gemäss den Scripts einen Fehler gefunden oder es läuft nicht wie geplant, wird die Software als _failed_ markiert. Verläuft alles positiv, wird es als _passed_ markiert.
+
+Je nach dem wie die CIs konfiguriert werden, können sie nach einem Test die Software publishen. Beispielsweise auf Docker Hub, oder sonst irgendwo. Sollte aber ein _Build_ den Status _failed_ erhalten, wird logischerweise diese Version nicht veröffentlicht. Sondern nur wenn die Tests positiv ausfallen.
+
+
 <br>
 
 ### Reflexion
@@ -409,25 +422,117 @@ Beispielsweise in K6 wird "Cloud-Integration" oder "Continuous Integration" vorg
 
 Insgesamt habe ich für die LB3 ungefähr einen Zeitaufwand von mindestens **26 Stunden** (Geschäft: 2 Halbtage à ~4h + 1 Tag ~8h, Schule: ~6h (8 Lektionen), zuhause: mind. 4h).
 
-
 <br>
 <br>
 
 ## K6 - Zusatz
 
 ### Umfangreiche Vernetzung
+Wie im [Netzwerkplan](#Netzwerkplan) ersichtlich wurden alle Container miteinander vernetzt, so dass die Container miteinander kommunizeren können. Dabei können beispielsweise die Webserver `web-nc` und `app-wp` mit dem Proxy kommunizieren und so die Webseite anzeigen. Auch kann phpMyAdmin mit beiden MariaDB-Datenbanken kommunizieren.
+
+In der Praxis würde man Wordpress nicht zusammen mit Nextcloud in einem Service/Docker-Compose einbauen. Aber als Beispiel was alles möglich ist, habe ich es so in der LB3 implementiert.
 
 
 <br>
 
 ### Image-Bereitstellung
+Die einzige Image, welche ich selber baue ist Nextcloud. Basierend auf deren Image, habe ich lediglich einen neuen Benutzer und eine neue Gruppe hinzugefügt und mit `USER` definiert. So läuft der Container am Schluss mit User-Rechten, statt mit root.
+
+Im `docker-compose.yml` kann eine eigene Image mithilfe von `build: <folder_of_dockerfile>` angegeben werden. Anschliessend kann mit `docker-compose -f <path_to_docker-compose.yml> up --build` alle eigene Images gebaut und anschliessend alle Container gestartet werden.
+
+
+_Dockerfile vom Container `app-nc`:_
+
+    FROM nextcloud:fpm-alpine
+
+    RUN addgroup -g 2906 -S appuser && \
+        adduser -u 2906 -S appuser -G appuser
+    USER appuser
+
+
+Theoretisch könnte man die Images noch in eine Repository (bspw. Docker Hub) hochladen und so der Community bereitstellen. Aber da ich lediglich nur einen User hinzufüge und diesen definiere, macht es kaum Sinn dies hochzuladen.
+
+#### .dockerignore
+Zusätzlich kann auch noch ein `.dockerignore`-Datei im Verzeichnis des Dockerfiles erstellt werden. Diese Datei ist dafür zuständig die entsprechend angegebenen Dateinamen (oder Muster) auszusortieren und in der Image nicht einzubauen. Zum Beispiel wird es genutzt um das Dockerfile selber vom Image auszuschliessen, oder irgendwelche temporäre Dateien (Logs). So wird die Dateigrösse der Image klein gehalten.
 
 
 <br>
 
 ### Continuous Integration
+[![Build Status](https://travis-ci.org/NiArq/TBZ-M300-LB3.svg?branch=master)](https://travis-ci.org/NiArq/TBZ-M300-LB3)
+
+Als CI (Abk. _Continuous Integration_) verwende ich **Travis CI**. Neben Jenkins ist es ebenfalls einer der meistgenutzten CIs. Auf GitHub findet man das obenstehende Icon ziemlich oft. Wenn man draufklickt gelangt man auf die Projektseite auf [travis-ci.org](https://travis-ci.org). \
+Darauf findet man die aktuellen Tests und ob sie erfolgreich verliefen, fehlschlugen oder abgebrochen wurden. Die ganzen Tests werden Befehl für Befehl geloggt. Auch die Ausgaben werden geloggt, so kann der Entwickler direkt feststellen wo der Fehler liegt.
+
+Logisch reicht es nicht einfach sich auf Travis CI einzuloggen und CI für sein Projekt einzuschalten. Damit es überhaupt funktioniert, benötigt es eine `.travis.yml`-Datei. Darin werden diverse Einstellungen definiert, z. B. Distro-Version, Programmiersprache/Service, Umgebungsvariablen, Scripts, etc. \
+Meine `.travis.yml`-Datei:
+
+    sudo: required
+    dist: bionic
+
+    services:
+      - docker
+
+    env:
+      - DOCKER_COMPOSE_VERSION='3'
+
+    install:
+      - sudo apt install docker.io
+      - docker version
+      # Update docker-compose via pip
+      - sudo pip install docker-compose
+      - docker-compose version
+
+    before_script:
+      - echo "127.0.0.1  nc.network.local" | sudo tee -a /etc/hosts
+      - echo "127.0.0.1  wp.network.local" | sudo tee -a /etc/hosts
+      - echo "127.0.0.1  pma.network.local" | sudo tee -a /etc/hosts
+      - docker-compose -f ./Nextcloud-Wordpress/docker-compose.yml up -d --build
+      - sleep 30
+
+    script: ./scripts/test.sh
+
+    after_script:
+      - docker rm -f $(docker ps -a -q)
+      - docker volume prune -f
+
+| Eigenschaft   | Beschreibung                                                                                                        |
+|---------------|---------------------------------------------------------------------------------------------------------------------|
+| sudo          | Definiert ob sudo/root-Rechte benötigt werden                                                                       |
+| dist          | Betriebssystem-Version für die Tests <br> (bionic = Ubuntu 18.04 "Bionic Beaver")                                   |
+| serivces      | Es wird Docker genutzt (statt einer Programmiersprache)                                                             |
+| env           | Definiert Umgebungsvariablen (engl. Environmental Variables)                                                        |
+| install       | Aktionen während der Installation des Betriebssystems <br> (Normalerweise Installationen von zusätzlichen Software) |
+| before_script | Aktionen vor dem `script`-Block <br> (Normalerweise Anpassungen an Dateien / Ausführen von Befehlen)                |
+| script        | Führt die Test-Scripts aus                                                                                          |
+| after_script  | Aktionen nach dem `script`-Block <br> (Normalerweise Aufräumung, z. B. Container löschen)                           |
 
 
-<br>
+Bei `script: ./scripts/test.sh` sieht man, dass eine Bash-Datei ausgeführt wird. Dieser beinhaltet die Tests um zu evaluieren, ob die Container funktionieren oder nicht. \
+Als Beispiel für die LB3 wird nur getestet, ob die Webadressen korrekt geladen werden. --> Fehler sofern kein HTTP 200 Code zurückgesendet wird. \
+test.sh:
 
-### Kubernetes (theoretisch)
+    # !/bin/sh
+
+    sites=( https://nc.network.local https://pma.network.local https://wp.network.local/wp-admin/install.php )
+
+    for s in "${sites[@]}"
+    do
+        status_code=$(curl --write-out %{http_code} --silent --head --output /dev/null -k $s)
+
+        if [[ "$status_code" -ne 200 ]] ; then
+            echo Site $s exits with code $status_code
+            exit 1
+        else
+            exit 0
+        fi
+    done
+
+Erklärung: Über die drei Webseiten wird geloopt. Für jede Website wird der HTTP Status Code mithilfe von Curl herausgelesen. Sollte der Status Code nicht "200" (Code "OK") entsprechen, wird mit `exit 1` beendet (Exit Code 1 = _minor problems_). Sollte eine Webseite nicht funktioniern, wird das gesamte Script mit Code 1 beendet. Ansonsten wird mit dem Code 0 (= "OK") fortgefahren.
+
+Der Grund weshalb überprüft wird, ob die Webseiten funktioniert ist folgender: Wird im `docker-compose.yml` herumgebastelt gibt es drei Ergebnisse:
+1. Alles funktioniert --> HTTP Code 200 --> Test positiv
+2. Berechtigungsprobleme --> Website kann nicht auf alle Daten zugreifen --> HTTP Code 5xx --> Test negativ
+3. Container startet nicht --> Website nicht erreichbar --> HTTP Code 5xx --> Test negativ
+
+Logisch kann das ganze noch ausgebaut werden. Beispielsweise kann getestet werden, ob die Datenbanken richtig funktioniern und die hinterlegten DB-User auch alle nötigten Berechtigungen haben, etc. Aber das würde den Zeitrahmen der LB3 sprengen.
