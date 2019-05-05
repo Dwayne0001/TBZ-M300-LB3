@@ -461,7 +461,7 @@ Zusätzlich kann auch noch ein `.dockerignore`-Datei im Verzeichnis des Dockerfi
 ### Continuous Integration
 [![Build Status](https://travis-ci.org/NiArq/TBZ-M300-LB3.svg?branch=master)](https://travis-ci.org/NiArq/TBZ-M300-LB3)
 
-Als CI (Abk. _Continuous Integration_) verwende ich **Travis CI**. Neben Jenkins ist es ebenfalls einer der meistgenutzten CIs. Auf GitHub findet man das obenstehende Icon ziemlich oft. Wenn man draufklickt gelangt man auf die Projektseite auf [travis-ci.org](https://travis-ci.org). \
+Als CI (abgek. _Continuous Integration_) verwende ich **Travis CI**. Neben Jenkins ist es ebenfalls einer der meistgenutzten CIs. Auf GitHub findet man das obenstehende Icon ziemlich oft. Wenn man draufklickt gelangt man auf die Projektseite auf [travis-ci.org](https://travis-ci.org). \
 Darauf findet man die aktuellen Tests und ob sie erfolgreich verliefen, fehlschlugen oder abgebrochen wurden. Die ganzen Tests werden Befehl für Befehl geloggt. Auch die Ausgaben werden geloggt, so kann der Entwickler direkt feststellen wo der Fehler liegt.
 
 Logisch reicht es nicht einfach sich auf Travis CI einzuloggen und CI für sein Projekt einzuschalten. Damit es überhaupt funktioniert, benötigt es eine `.travis.yml`-Datei. Darin werden diverse Einstellungen definiert, z. B. Distro-Version, Programmiersprache/Service, Umgebungsvariablen, Scripts, etc. \
