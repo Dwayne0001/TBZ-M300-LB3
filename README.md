@@ -36,13 +36,13 @@ Anderes Repository (LB2): <https://github.com/NiArq/TBZ-M300>
   - [K5 - Allgemein](#k5---allgemein)
     - [Vergleich Vorwissen - Wissenszuwachs](#vergleich-vorwissen---wissenszuwachs)
       - [Docker-Compose](#docker-compose)
-      - [Continuous Integration](#continuous-integration)
+      - [Continuous Integration (CI)](#continuous-integration-ci)
     - [Reflexion](#reflexion)
   - [K6 - Zusatz](#k6---zusatz)
     - [Umfangreiche Vernetzung](#umfangreiche-vernetzung)
     - [Image-Bereitstellung](#image-bereitstellung)
       - [.dockerignore](#dockerignore)
-    - [Continuous Integration](#continuous-integration-1)
+    - [Continuous Integration](#continuous-integration)
 
 <br>
 <br>
@@ -401,7 +401,7 @@ Nach meinen Tests, musste ich jeweils alle Container und Volumes entferen, um di
 | Einzeiler (PowerShell) | `docker rm -f $(docker ps -a -q); docker volume prune -f`   |
 
 
-#### Continuous Integration
+#### Continuous Integration (CI)
 Von _Continuous Integration_ (kurz CI) hatte ich zuvor noch nie etwas gehört. Zwar sagte mir _Jenkins_ (belibter CI) etwas, aber an sich wusste ich nicht, wie das fukntioniert und was das genau ist.
 
 Jetzt weiss ich, dass CI (vor allem) für die Entwicklung von Software benutzt wird. Dabei wird an der Software "gebastelt" und danach z. B. auf GitHub hochgeladen. Anschliessend testet ein CI-Programm (z. B. _Jenkins_ oder _Travis CI_) mithilfe eines vordefinierten Scripts die hochgeladene Software. Wird gemäss den Scripts einen Fehler gefunden oder es läuft nicht wie geplant, wird die Software als _failed_ markiert. Verläuft alles positiv, wird es als _passed_ markiert.
